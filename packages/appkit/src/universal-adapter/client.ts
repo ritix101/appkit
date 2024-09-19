@@ -152,6 +152,7 @@ export class UniversalAdapterClient {
         ) {
           const adapter = ChainController.state.chains.get(ChainController.state.activeChain)
           await adapter?.connectionControllerClient?.connectWalletConnect?.(onUri)
+          this.appKit?.setIsConnected(true, this.chainNamespace)
           this.setWalletConnectProvider()
         } else {
           const siweParams = await siweConfig?.getMessageParams?.()
@@ -220,6 +221,7 @@ export class UniversalAdapterClient {
             const optionalNamespaces = WcHelpersUtil.createNamespaces(this.caipNetworks)
             await WalletConnectProvider.connect({ optionalNamespaces })
           }
+          this.appKit?.setIsConnected(true, this.chainNamespace)
           this.setWalletConnectProvider()
         }
       },
@@ -235,6 +237,7 @@ export class UniversalAdapterClient {
 
         await this.walletConnectProvider?.disconnect()
 
+        this.appKit?.setIsConnected(false)
         this.appKit?.resetAccount('eip155')
         this.appKit?.resetAccount('solana')
       },
@@ -503,7 +506,10 @@ export class UniversalAdapterClient {
     }
 
     if (provider) {
-      provider.on('disconnect', disconnectHandler)
+      provider.on('disconnect', () => {
+        this.appKit?.setIsConnected(false)
+        disconnectHandler()
+      })
       provider.on('accountsChanged', accountsChangedHandler)
       provider.on('chainChanged', chainChanged)
     }

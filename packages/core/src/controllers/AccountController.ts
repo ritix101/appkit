@@ -97,10 +97,7 @@ export const AccountController = {
     )
   },
 
-  setIsConnected(
-    isConnected: AccountControllerState['isConnected'],
-    chain: ChainNamespace | undefined
-  ) {
+  setIsConnected(isConnected: AccountControllerState['isConnected'], chain?: ChainNamespace) {
     ChainController.setAccountProp('isConnected', isConnected, chain)
   },
 
